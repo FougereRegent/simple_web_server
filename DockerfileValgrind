@@ -1,0 +1,24 @@
+FROM ubuntu:latest AS compil
+MAINTAINER Venant-Valéry Damien
+
+WORKDIR /compil
+
+RUN apt-get update \
+&& apt-get upgrade -yq \
+&& apt-get install build-essential make -yq
+
+COPY ./src/. .
+COPY ./Makefile .
+
+RUN make
+
+FROM ubuntu:latest
+WORKDIR /app
+
+RUN apt-get update \
+&& apt-get upgrade -yq \
+&& apt-get install valgrind -yq
+
+COPY --from=compil /compil/server_web .
+ADD ./www-data ./www-data/.
+CMD ["valgrind", "--tool=memcheck", "--leak-check=yes", "--show-reachable=yes","./server_web"]
