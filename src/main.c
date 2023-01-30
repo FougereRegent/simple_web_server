@@ -19,9 +19,21 @@ typedef enum {
 	POST
 } ENUM_VERB;
 
+typedef enum {
+	OK = 200,
+	NOT_FOUND = 404,
+} ENUM_CODE;
+
 
 static void handle_connection(int, struct sockaddr_in*);
 static void wich_verb(ENUM_VERB);
+static void send_header(int);
+static void get_verb(int, const char*);
+static void put_verb(int, const char*);
+static void delete_verb(int, const char*);
+static void post_verb(int, const char*);
+static void head_verb(int, const char*);
+
 
 int main(int argc, char **argv){
 
@@ -119,4 +131,31 @@ static void wich_verb(ENUM_VERB verb)
 		case DELETE: break;
 		case POST: break;
 	}
+}
+
+static void send_header(int sock, int error_code) 
+{
+	const char *header = "HTTP/1 200 OK\r\nserver: tiny-server\r\n\r\n";
+	send_message(sock, (unsigned char*)header);
+}
+
+static void get_verb(int sock, const char* route)
+{
+
+}
+static void put_verb(int sock, const char* route) 
+{
+
+}
+static void delete_verb(int sock, const char* route)
+{
+
+}
+static void post_verb(int sock, const char* route)
+{
+
+}
+static void head_verb(int sock, const char* route)
+{
+
 }
