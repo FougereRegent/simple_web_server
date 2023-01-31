@@ -26,8 +26,8 @@ typedef enum {
 
 
 static void handle_connection(int, struct sockaddr_in*);
-static void wich_verb(ENUM_VERB);
-static void send_header(int);
+static void wich_verb(int, char*, ENUM_VERB);
+static void send_header(int, int);
 static void get_verb(int, const char*);
 static void put_verb(int, const char*);
 static void delete_verb(int, const char*);
@@ -97,15 +97,19 @@ static void handle_connection(int sock, struct sockaddr_in* addr) {
 		*ptr = 0;
 		if(strncmp((char*) request, "GET ", 4) == 0) {
 			ptr = request + 4;
+			wich_verb(sock, (char *)ptr + 1, GET);
 		}
 		else if(strncmp((char*) request, "PUT ", 4) == 0){
 			ptr = request + 4;
+			wich_verb(sock, (char *)ptr + 1, PUT);
 		}
 		else if(strncmp((char*) request, "DELETE ", 7) == 0) {
 			ptr = request + 7;
+			wich_verb(sock, (char *)ptr + 1, DELETE);
 		}
 		else if(strncmp((char*) request, "HEAD ", 5) == 0) {
 			ptr = request + 5;
+			wich_verb(sock, (char *)ptr + 1, HEAD);
 		}
 		else {
 			ptr = NULL;
@@ -122,20 +126,30 @@ static void handle_connection(int sock, struct sockaddr_in* addr) {
 	shutdown(sock, SHUT_RDWR);
 }
 
-static void wich_verb(ENUM_VERB verb)
+static void wich_verb(int sock, char *route,ENUM_VERB verb)
 {
 	switch(verb) {
-		case GET: break;
-		case HEAD: break;
-		case PUT: break;
-		case DELETE: break;
-		case POST: break;
+		case GET:
+			get_verb(sock, route);
+			break;
+		case HEAD:
+			head_verb(sock, route);
+			break;
+		case PUT:
+			put_verb(sock, route);
+			break;
+		case DELETE: 
+			delete_verb(sock, route);
+			break;
+		case POST: 
+			post_verb(sock, route);
+			break;
 	}
 }
 
 static void send_header(int sock, int error_code) 
 {
-	const char *header = "HTTP/1 200 OK\r\nserver: tiny-server\r\n\r\n";
+	const char *header = "HTTP/1.1 200 OK\r\nServer: tiny-server\r\n\r\n";
 	send_message(sock, (unsigned char*)header);
 }
 
