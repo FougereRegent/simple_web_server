@@ -221,12 +221,6 @@ static void send_header(int sock, ENUM_CODE error_code)
 	const char *header = "Server: tiny-server\r\n\r\n"
 						"Author: Venant-Valéry Damien";
 
-	switch(error_code) {
-		case NOT_FOUND:
-			break;
-		case OK:
-			break;
-	}
 	send_message(sock, (unsigned char*)header);
 }
 
