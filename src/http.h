@@ -14,4 +14,4 @@ struct codes {
 };
 
 extern struct codes get_code(int key);
-extern struct http_codes create_dict();
+extern void create_dict(struct http_codes *dict);

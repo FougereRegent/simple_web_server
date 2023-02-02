@@ -3,14 +3,16 @@
 
 #include "http.h"
 
+#define DEFAULT_NUMBER 5;
+
 static int add(int, char*);
 
-extern struct codes get_code(int key) {
-
+extern void create_dict(struct http_codes *dict) {
+	
 }
 
-extern struct http_codes create_dict() {
-	
+extern struct codes get_code(int key) {
+	struct codes result;
 }
 
 static int add(int key, char *value) {
