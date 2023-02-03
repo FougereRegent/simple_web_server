@@ -1,7 +1,6 @@
-#define ADD_ERROR -1
-#define GET_ERROR -1
-#define ADD_SUCESS 0
-#define GET_SUCESS 0
+#define ADD_ELEMENT 0
+#define EXIST_ELEMENT -1
+#define NO_VALUE -2
 
 struct element {
 	int key;
@@ -14,5 +13,7 @@ struct hashtable {
 	int count;
 };
 
-extern struct element *create_element(const int key, const char restrict* value);
 extern struct hashtable *create_table(const int);
+extern int add_element(const struct element* element);
+extern void free_item(struct element *item);
+extern void free_table(struct hashtable *table);
