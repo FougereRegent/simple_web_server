@@ -7,9 +7,11 @@
 #include <netinet/in.h>
 #include <errno.h>
 #include "communication.h"
+#include "hashtable.h"
 
 #define PORT 8080
 #define MAX_BUFFER 4096
+#define HEADER_SIZE 12392
 
 typedef enum {
 	GET,
@@ -95,6 +97,7 @@ typedef enum {
 
 
 static void handle_connection(int, struct sockaddr_in*);
+static int create_http_table();
 static void wich_verb(int, char*, ENUM_VERB);
 static void send_header(int, ENUM_CODE);
 static void get_verb(int, const char*);
@@ -103,6 +106,7 @@ static void delete_verb(int, const char*);
 static void post_verb(int, const char*);
 static void head_verb(int, const char*);
 
+struct hashtable *http_table;
 
 int main(int argc, char **argv){
 
@@ -137,6 +141,11 @@ int main(int argc, char **argv){
 		perror("listen() : ");
 		exit(errno);
 	}
+	
+	if(create_http_table() < 0) {
+		exit(0); 
+	}
+
 	fprintf(stdout, "Web server ....\n");
 	sinsize = sizeof(struct sockaddr_in);
 	while(1) {
@@ -195,6 +204,88 @@ static void handle_connection(int sock, struct sockaddr_in* addr) {
 	shutdown(sock, SHUT_RDWR);
 }
 
+static int create_http_table() {
+	int result = 0;
+	http_table = create_table(70);
+
+	result += add_element(http_table, 100, "CONTINUE");
+	result += add_element(http_table, 101, "SWITCH_PROTOCOLS");
+	result += add_element(http_table, 102, "PROCESSING");
+	result += add_element(http_table, 103, "EARLY_HINTS");
+	result += add_element(http_table, 200, "OK");
+	result += add_element(http_table, 201, "CREATED");
+	result += add_element(http_table, 202, "ACCEPTED");
+	result += add_element(http_table, 203, "NON_AUTHORITATIVE_INFORMATION");
+	result += add_element(http_table, 204, "NO_CONTENT");
+	result += add_element(http_table, 205, "RESET_CONTENT");
+	result += add_element(http_table, 206, "PARTIAL_CONTENT");
+	result += add_element(http_table, 207, "MULTI_STATUS");
+	result += add_element(http_table, 208, "ALREADY_REPORTED");
+	result += add_element(http_table, 210, "CONTENT_DIFFERENT");
+	result += add_element(http_table, 226, "IM_USED");
+	result += add_element(http_table, 300, "MULTIPLE_CHOICES");
+	result += add_element(http_table, 301, "MOVED_PERMANENTLY");
+	result += add_element(http_table, 302, "FOUND");
+	result += add_element(http_table, 303, "SEE_OTHER");
+	result += add_element(http_table, 304, "NOT_MODIFIED");
+	result += add_element(http_table, 305, "USE_PROXY");
+	result += add_element(http_table, 306, "SWITCH_PROXY");
+	result += add_element(http_table, 307, "TEMPORALY_REDIRECT");
+	result += add_element(http_table, 308, "PERMANENT_REDIRECT");
+	result += add_element(http_table, 310, "TOO_MANY_REDIRECT");
+	result += add_element(http_table, 400, "BAD_REQUEST");
+	result += add_element(http_table, 401, "UNAUTHORIZED");
+	result += add_element(http_table, 402, "PAYMENT_REQUIRED");
+	result += add_element(http_table, 403, "FORBIDDEN");
+	result += add_element(http_table, 404, "NOT_FOUND");
+	result += add_element(http_table, 405, "METHOD_NOT_ALLOWED");
+	result += add_element(http_table, 406, "NOT_ACCEPTABLE");
+	result += add_element(http_table, 407, "PROXY_AUTHENTICATION_REQUIRED");
+	result += add_element(http_table, 408, "REQUEST_TIME_OUT");
+	result += add_element(http_table, 409, "CONFLICT");
+	result += add_element(http_table, 410, "GONE");
+	result += add_element(http_table, 411, "LENGHT_REQUIRED");
+	result += add_element(http_table, 412, "PRECONDITION_FAILED");
+	result += add_element(http_table, 413, "REQUEST_ENTITY_TOO_LARGE");
+	result += add_element(http_table, 414, "REQUEST_URI_TOO_LONG");
+	result += add_element(http_table, 415, "UNSUPPORTED_MEDIA_TYPE");
+	result += add_element(http_table, 416, "REQUEST_RANGE_UNSATISFIABLE");
+	result += add_element(http_table, 417, "EXCEPTATION_FAILED");
+	result += add_element(http_table, 418, "TEAPOT");
+	result += add_element(http_table, 419, "PAGE_EXPIRED");
+	result += add_element(http_table, 421, "BAD_MAPPING");
+	result += add_element(http_table, 422, "UNPROCESSABLE_ENTITY");
+	result += add_element(http_table, 423, "LOCKED");
+	result += add_element(http_table, 424, "METHOD_FAILURE");
+	result += add_element(http_table, 425, "TOO_EARLY");
+	result += add_element(http_table, 426, "UPGRADE_REQUIRED");
+	result += add_element(http_table, 428, "PRECONDITION_REQUIRED");
+	result += add_element(http_table, 429, "TOO_MANY_REQUEST");
+	result += add_element(http_table, 431, "REQUEST_HEADER_FIELDS_TOO_LARGE");
+	result += add_element(http_table, 449, "RETRY_WITH");
+	result += add_element(http_table, 450, "BLOCKED_BY_WINDOWS_PARENTAL_CONTROL");
+	result += add_element(http_table, 451, "UNVAILABLE_FOR_LEGAL_REASON");
+	result += add_element(http_table, 456, "UNRECOVERABLE_ERROR");
+	result += add_element(http_table, 500, "INTERNAL_SERVER_ERROR");
+	result += add_element(http_table, 501, "NOT_IMPLEMENTED");
+	result += add_element(http_table, 502, "BAD_GATEWAY");
+	result += add_element(http_table, 503, "SERVICE_UNAVAILABLE");
+	result += add_element(http_table, 504, "GATEWAY_TIME_OUT");
+	result += add_element(http_table, 505, "HTTP_VERSION_NOT_SUPPORTED");
+	result += add_element(http_table, 506, "VARIANT_ALSO_NEGOTIATES");
+	result += add_element(http_table, 507, "INSUFFICIENT_STORAGE");
+	result += add_element(http_table, 508, "LOOP_DETECTED");
+	result += add_element(http_table, 509, "BANDWITH_LIMIT_EXCEEDED");
+	result += add_element(http_table, 510, "NOT_EXTENDED");
+	result += add_element(http_table, 511, "NETWORK_AUTHENTIFICATION_REQUIRED");
+
+	if(result < 0) {
+		free_table(http_table);
+		return -1;
+	}
+	return 0;
+}
+
 static void wich_verb(int sock, char *route,ENUM_VERB verb)
 {
 	switch(verb) {
@@ -216,31 +307,34 @@ static void wich_verb(int sock, char *route,ENUM_VERB verb)
 	}
 }
 
-static void send_header(int sock, ENUM_CODE error_code) 
-{
-	const char *header = "Server: tiny-server\r\n\r\n"
-						"Author: Venant-Valéry Damien";
+static void send_header(int sock, ENUM_CODE error_code)  {
+	struct element *item;
+	char res[HEADER_SIZE];
+	const char *header = "Server: tiny-server\r\n"
+						"Author: Venant-Valery Damien\r\n\r\n\r\n";
 
-	send_message(sock, (unsigned char*)header);
+	memset((char *)res, 0, HEADER_SIZE);
+	item = get_item(http_table, error_code);
+	
+	sprintf(res, "HTTP/1.1 %d %s\r\n%s", 
+			error_code, 
+			item->value, 
+			header);
+	send_message(sock, (unsigned char*)res);
 }
 
-static void get_verb(int sock, const char* route)
-{
+static void get_verb(int sock, const char* route) {
 
 }
-static void put_verb(int sock, const char* route) 
-{
+static void put_verb(int sock, const char* route) {
 
 }
-static void delete_verb(int sock, const char* route)
-{
+static void delete_verb(int sock, const char* route) {
 
 }
-static void post_verb(int sock, const char* route)
-{
+static void post_verb(int sock, const char* route) {
 
 }
-static void head_verb(int sock, const char* route)
-{
+static void head_verb(int sock, const char* route) {
 
 }

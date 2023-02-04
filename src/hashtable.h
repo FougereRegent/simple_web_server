@@ -18,3 +18,4 @@ extern struct hashtable *create_table(const unsigned int size);
 extern int add_element(struct hashtable *table, int key, char *value);
 extern void free_item(struct element *item);
 extern void free_table(struct hashtable *table);
+extern struct element *get_item(struct hashtable *table, const int key);

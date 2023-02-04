@@ -9,12 +9,10 @@ RUN apt-get update \
 
 COPY ./src/. .
 COPY ./Makefile .
-
 RUN make
 
 FROM ubuntu:latest
 WORKDIR /app
 
 COPY --from=0 /compil/server_web .
-
 CMD ["./server_web"]

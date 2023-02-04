@@ -62,11 +62,24 @@ extern int add_element(struct hashtable *table, int key, char *value) {
 	return ADD_ELEMENT;
 }
 
+extern struct element *get_item(struct hashtable *table, const int key) {
+	int index;
+	element *item;
+	for(index = 0; index < table->size; index++) {
+		item = table->e[index];
+		if(item->key == key) {
+			return item;
+		}
+	}
+	return NULL;
+}
 static int check_element(const hashtable *table, const int key) {
 	int index;
 	element *item;
 	for (index = 0; index < table->size; index++) {
 		item = table->e[index];
+		if(item == NULL)
+			continue;
 		if(item->key == key)
 			return EXIST_ELEMENT;
 	}
