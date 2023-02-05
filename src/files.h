@@ -1,5 +1,14 @@
-/*Header files*/
+#ifndef _HANDLE_FILES_H
+#include<stdio.h>
+#include<stdlib.h>
+#endif
 
-extern long file_size();
-extern void file_content(const char *filename, unsigned char *buffer, long size);
-extern int file_exist(const char *filename);
+struct file_info {
+	FILE *fp;
+	char *filename;
+	long size;
+};
+
+extern struct file_info *open_file(const char *filename);
+extern char *file_content(const FILE *fp);
+extern long file_size(const FILE *fp);

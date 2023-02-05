@@ -1,33 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include "files.h"
 
-extern long file_size(const char *filename)
-{
-	struct stat stat_struct;
-	int fp = open(filename, O_RDONLY, 0);
-	
-	if(fstat(fp, &stat_struct) == -1)
-		return -1;
-	close(fp);
-	return (int) stat_struct.st_size;
-}
-extern void file_content(const char *filename, unsigned char *buffer, long size)
-{
-	int fp = open(filename, O_RDONLY, 0);
-	read(fp, buffer, size);
-	close(fp);
+#define FILE_PATH "www-data/"
+
+
+static int check_file(const char *filename);
+
+extern struct file_info *open_file(const char *filename) {
+	return NULL;
 }
 
-extern int file_exist(const char *filename)
-{
-	FILE *fp = fopen(filename, "r");
-	if(fp == NULL) {
-		return 0;
-	}
-	
-	fclose(fp);
-	return 1;
+extern char *file_content(const FILE *fp) {
+	return NULL;
+}
+
+extern long file_size(const FILE *fp) {
+	return 0;
+}
+
+static int check_file(const char *filename) {
+	int status;
+	struct stat s;
+
+	return 0;
 }

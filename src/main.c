@@ -175,19 +175,19 @@ static void handle_connection(int sock, struct sockaddr_in* addr) {
 		*ptr = 0;
 		if(strncmp((char*) request, "GET ", 4) == 0) {
 			ptr = request + 4;
-			wich_verb(sock, (char *)ptr + 1, GET);
+			wich_verb(sock, (char *)ptr, GET);
 		}
 		else if(strncmp((char*) request, "PUT ", 4) == 0){
 			ptr = request + 4;
-			wich_verb(sock, (char *)ptr + 1, PUT);
+			wich_verb(sock, (char *)ptr, PUT);
 		}
 		else if(strncmp((char*) request, "DELETE ", 7) == 0) {
 			ptr = request + 7;
-			wich_verb(sock, (char *)ptr + 1, DELETE);
+			wich_verb(sock, (char *)ptr, DELETE);
 		}
 		else if(strncmp((char*) request, "HEAD ", 5) == 0) {
 			ptr = request + 5;
-			wich_verb(sock, (char *)ptr + 1, HEAD);
+			wich_verb(sock, (char *)ptr, HEAD);
 		}
 		else {
 			ptr = NULL;
@@ -286,8 +286,7 @@ static int create_http_table() {
 	return 0;
 }
 
-static void wich_verb(int sock, char *route,ENUM_VERB verb)
-{
+static void wich_verb(int sock, char *route,ENUM_VERB verb) {
 	switch(verb) {
 		case GET:
 			get_verb(sock, route);
@@ -324,7 +323,9 @@ static void send_header(int sock, ENUM_CODE error_code)  {
 }
 
 static void get_verb(int sock, const char* route) {
-
+	int route_size = strlen(route);
+	if(strncmp(route, "/", route_size) == 0) {
+	}
 }
 static void put_verb(int sock, const char* route) {
 

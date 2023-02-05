@@ -73,6 +73,7 @@ extern struct element *get_item(struct hashtable *table, const int key) {
 	}
 	return NULL;
 }
+
 static int check_element(const hashtable *table, const int key) {
 	int index;
 	element *item;
