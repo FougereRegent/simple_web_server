@@ -3,8 +3,8 @@
 #include<stdlib.h>
 #endif
 
-#define NOT_FOUND -1
-#define NON_AUTHORISATION -2
+#define ERROR_NOT_FOUND -1
+#define ERROR_NON_AUTHORISATION -2
 
 struct file_info {
 	FILE *fp;
@@ -13,5 +13,5 @@ struct file_info {
 };
 
 extern struct file_info *open_file(const char *filename);
-extern char *file_content(const FILE *fp);
 extern long file_size(const char *filename);
+extern void free_struct(struct file_info* info);

@@ -21,23 +21,24 @@ extern struct file_info *open_file(const char *filename) {
 	return info;
 }
 
-extern char *file_content(const FILE *fp) {
-	return NULL;
-}
-
 extern long file_size(const char *filename) {
 	long file_size = 0;
 	char *pathfile =  reel_path(filename);
 	struct stat st;
 
 	if(check_file(pathfile) == -1)
-		return NON_AUTHORISATION;
+		return ERROR_NON_AUTHORISATION;
 
 	if(stat(filename, &st) == -1)
 		return -1;
 	file_size = st.st_size;
 	free(pathfile);
 	return file_size;
+}
+
+extern void free_struct(struct file_info* info) {
+	free(info->filename);
+	fclose(info->fp);
 }
 
 static int check_file(const char *filename) {

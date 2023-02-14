@@ -6,8 +6,10 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <errno.h>
+
 #include "communication.h"
 #include "hashtable.h"
+#include "files.h"
 
 #define PORT 8080
 #define MAX_BUFFER 4096
