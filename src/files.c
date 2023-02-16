@@ -8,15 +8,15 @@
 
 #define FILE_PATH "www-data"
 
-
 static int check_file(const char *filename);
 static char* reel_path(const char* filename);
+
 
 extern struct file_info *open_file(const char *filename) {
 	struct file_info *info = (struct file_info*) malloc(sizeof(struct file_info));
 	info->filename = reel_path(filename);
 	info->size = file_size(filename);
-	if((info->fp = fopen(info->filename, "r")) == NULL)
+	if((info->fp = open(info->filename, O_RDONLY, 0)) == -1)
 		return NULL;
 	return info;
 }
@@ -30,7 +30,8 @@ extern long file_size(const char *filename) {
 		return ERROR_NON_AUTHORISATION;
 
 	if(stat(filename, &st) == -1)
-		return -1;
+		return ERROR_NOT_FOUND;
+
 	file_size = st.st_size;
 	free(pathfile);
 	return file_size;
@@ -38,7 +39,7 @@ extern long file_size(const char *filename) {
 
 extern void free_struct(struct file_info* info) {
 	free(info->filename);
-	fclose(info->fp);
+	close(info->fp);
 }
 
 static int check_file(const char *filename) {

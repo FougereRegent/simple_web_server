@@ -14,6 +14,7 @@
 #define PORT 8080
 #define MAX_BUFFER 4096
 #define HEADER_SIZE 12392
+#define INDEX_PAGE "index.html" 
 
 typedef enum {
 	GET,
@@ -96,7 +97,6 @@ typedef enum {
 	NETWORK_AUTHENTIFICATION_REQUIRED = 511
 
 } ENUM_CODE;
-
 
 static void handle_connection(int, struct sockaddr_in*);
 static int create_http_table();
@@ -326,9 +326,22 @@ static void send_header(int sock, ENUM_CODE error_code)  {
 
 static void get_verb(int sock, const char* route) {
 	int route_size = strlen(route);
+	struct file_info *info;
+	int file;
+	unsigned char *result;
+
 	if(strncmp(route, "/", route_size) == 0) {
+		info = open_file(INDEX_PAGE);
+		file = info->fp;
 	}
+
+	result = (unsigned char*) malloc(info->size);
+	read(file, result, info->size);
+	send(sock, result, info->size, 0);
+	free(result);
+	free_struct(info);
 }
+
 static void put_verb(int sock, const char* route) {
 
 }

@@ -7,7 +7,7 @@
 #define ERROR_NON_AUTHORISATION -2
 
 struct file_info {
-	FILE *fp;
+	int fp;
 	char *filename;
 	long size;
 };
