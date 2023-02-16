@@ -175,6 +175,7 @@ static void handle_connection(int sock, struct sockaddr_in* addr) {
 
 	if(ptr != NULL) {
 		*ptr = 0;
+		fprintf(stdout, "%s\n", ptr);
 		if(strncmp((char*) request, "GET ", 4) == 0) {
 			ptr = request + 4;
 			wich_verb(sock, (char *)ptr, GET);
@@ -329,14 +330,15 @@ static void get_verb(int sock, const char* route) {
 	struct file_info *info;
 	int file;
 	unsigned char *result;
-
-	if(strncmp(route, "/", route_size) == 0) {
+	if(strncmp(route, "/ ", route_size) == 0) {
 		info = open_file(INDEX_PAGE);
 		file = info->fp;
 	}
 
 	result = (unsigned char*) malloc(info->size);
 	read(file, result, info->size);
+	
+	send_header(sock, OK);
 	send(sock, result, info->size, 0);
 	free(result);
 	free_struct(info);

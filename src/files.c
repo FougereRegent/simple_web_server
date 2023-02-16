@@ -15,7 +15,7 @@ static char* reel_path(const char* filename);
 extern struct file_info *open_file(const char *filename) {
 	struct file_info *info = (struct file_info*) malloc(sizeof(struct file_info));
 	info->filename = reel_path(filename);
-	info->size = file_size(filename);
+	info->size = file_size(info->filename);
 	if((info->fp = open(info->filename, O_RDONLY, 0)) == -1)
 		return NULL;
 	return info;
@@ -23,17 +23,15 @@ extern struct file_info *open_file(const char *filename) {
 
 extern long file_size(const char *filename) {
 	long file_size = 0;
-	char *pathfile =  reel_path(filename);
 	struct stat st;
 
-	if(check_file(pathfile) == -1)
+	if(check_file(filename) == -1)
 		return ERROR_NON_AUTHORISATION;
 
 	if(stat(filename, &st) == -1)
 		return ERROR_NOT_FOUND;
 
 	file_size = st.st_size;
-	free(pathfile);
 	return file_size;
 }
 
