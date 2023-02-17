@@ -38,6 +38,20 @@ extern long file_size(const char *filename) {
 extern void free_struct(struct file_info* info) {
 	free(info->filename);
 	close(info->fp);
+	free(info);
+}
+
+extern int file_exist(const char* filename) {
+	char *filepath = reel_path(filename);
+	int result = 0;
+	
+	if(access(filepath, F_OK) == 0)
+		result = 0;
+	else
+		result = ERROR_NOT_FOUND;
+
+	free(filepath);
+	return result;
 }
 
 static int check_file(const char *filename) {

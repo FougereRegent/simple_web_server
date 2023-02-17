@@ -107,6 +107,7 @@ static void put_verb(int, const char*);
 static void delete_verb(int, const char*);
 static void post_verb(int, const char*);
 static void head_verb(int, const char*);
+static void send_file(int sock, const char* filename);
 
 struct hashtable *http_table;
 
@@ -204,7 +205,10 @@ static void handle_connection(int sock, struct sockaddr_in* addr) {
 		fprintf(stdout, "Error Not HTTP request");
 	}
 
-	shutdown(sock, SHUT_RDWR);
+	if(shutdown(sock, SHUT_WR) == -1) {
+		perror("shutdown(): ");
+	}
+	close(sock);
 }
 
 static int create_http_table() {
@@ -327,21 +331,21 @@ static void send_header(int sock, ENUM_CODE error_code)  {
 
 static void get_verb(int sock, const char* route) {
 	int route_size = strlen(route);
-	struct file_info *info;
-	int file;
 	unsigned char *result;
 	if(strncmp(route, "/ ", route_size) == 0) {
-		info = open_file(INDEX_PAGE);
-		file = info->fp;
 	}
-
-	result = (unsigned char*) malloc(info->size);
-	read(file, result, info->size);
-	
-	send_header(sock, OK);
-	send(sock, result, info->size, 0);
-	free(result);
-	free_struct(info);
+	else {
+		char *ptr = route + 1;
+		int result_file_exist = file_exist(ptr);
+		switch(result_file_exist) {
+			case ERROR_NOT_FOUND:
+				send_header(sock, NOT_FOUND);
+			case ERROR_NON_AUTHORISATION:
+				send_header(sock, NON_AUTHORITATIVE_INFORMATION);
+			case 0:
+				send_header(sock, OK);
+		}
+	}
 }
 
 static void put_verb(int sock, const char* route) {
@@ -355,4 +359,11 @@ static void post_verb(int sock, const char* route) {
 }
 static void head_verb(int sock, const char* route) {
 
+}
+
+static void send_file(int sock, const char* filename) {
+	struct file_info *info;
+	int file;
+	info = open_file(INDEX_PAGE);
+	file = info->fp;
 }
