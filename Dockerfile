@@ -15,4 +15,7 @@ FROM ubuntu:latest
 WORKDIR /app
 
 COPY --from=0 /compil/server_web .
+COPY --from=0 /compil/*.c ./
+COPY ./www-data/ ./www-data/.
+
 CMD ["./server_web"]

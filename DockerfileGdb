@@ -20,4 +20,6 @@ RUN apt-get update \
 
 COPY --from=0 /compil/server_web .
 COPY --from=0 /compil/*.c ./
+COPY ./www-data/ ./www-data/.
+
 CMD ["gdb", "server_web"]
