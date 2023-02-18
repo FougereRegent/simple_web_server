@@ -13,9 +13,11 @@ RUN make
 
 FROM ubuntu:latest
 WORKDIR /app
+
 RUN apt-get update \
 && apt-get upgrade -yq \
 && apt-get install gdb -yq
 
 COPY --from=0 /compil/server_web .
+COPY --from=0 /compil/*.c ./
 CMD ["gdb", "server_web"]
