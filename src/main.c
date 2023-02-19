@@ -175,7 +175,7 @@ static void handle_connection(int sock, struct sockaddr_in* addr) {
 	fprintf(stdout, "%s\n", request);
 
 	if(ptr != NULL) {
-		*ptr = 0;
+		*(ptr - 1) = 0;
 		fprintf(stdout, "%s\n", ptr);
 		if(strncmp((char*) request, "GET ", 4) == 0) {
 			ptr = request + 4;
@@ -317,7 +317,7 @@ static void send_header(int sock, ENUM_CODE error_code)  {
 	struct element *item;
 	char res[HEADER_SIZE];
 	const char *header = "Server: tiny-server\r\n"
-						"Author: Venant-Valery Damien\r\n\r\n\r\n";
+						 "Author: Venant-Valery Damien\r\n\r\n";
 
 	memset((char *)res, 0, HEADER_SIZE);
 	item = get_item(http_table, error_code);
@@ -333,17 +333,31 @@ static void get_verb(int sock, const char* route) {
 	int route_size = strlen(route);
 	unsigned char *result;
 	if(strncmp(route, "/ ", route_size) == 0) {
-	}
-	else {
-		char *ptr = route + 1;
-		int result_file_exist = file_exist(ptr);
+		int result_file_exist = file_exist(INDEX_PAGE);
 		switch(result_file_exist) {
 			case ERROR_NOT_FOUND:
 				send_header(sock, NOT_FOUND);
+				break;
 			case ERROR_NON_AUTHORISATION:
 				send_header(sock, NON_AUTHORITATIVE_INFORMATION);
+				break;
 			case 0:
 				send_header(sock, OK);
+				send_file(sock, INDEX_PAGE);
+				break;
+		}
+	}
+	else {
+		const char *ptr = route + 1;
+		int result_file_exist = file_exist(ptr);
+		switch(result_file_exist) {
+		case ERROR_NOT_FOUND:
+			send_header(sock, NOT_FOUND);
+		case ERROR_NON_AUTHORISATION:
+			send_header(sock, NON_AUTHORITATIVE_INFORMATION);
+		case 0:
+			send_header(sock, OK);
+			send_file(sock, ptr);
 		}
 	}
 }
@@ -363,7 +377,17 @@ static void head_verb(int sock, const char* route) {
 
 static void send_file(int sock, const char* filename) {
 	struct file_info *info;
-	int file;
-	info = open_file(INDEX_PAGE);
-	file = info->fp;
+	int size, total_sent = 0;
+	int packet_size = 1024;
+	info = open_file(filename);
+	size = info->size;
+	while(total_sent < size) {
+		int remaining = size - total_sent;
+		int packet_len = remaining > packet_size ? packet_size : remaining;
+		int sent = send(sock, info->data + total_sent, packet_len, 0);
+		if(sent == - 1) {
+			break;
+		}
+		total_sent += sent;
+	}
 }

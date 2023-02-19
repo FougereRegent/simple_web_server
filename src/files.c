@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
 #include "files.h"
 
 #define FILE_PATH "www-data"
@@ -11,13 +12,16 @@
 static int check_file(const char *filename);
 static char* reel_path(const char* filename);
 
-
 extern struct file_info *open_file(const char *filename) {
 	struct file_info *info = (struct file_info*) malloc(sizeof(struct file_info));
 	info->filename = reel_path(filename);
 	info->size = file_size(info->filename);
 	if((info->fp = open(info->filename, O_RDONLY, 0)) == -1)
 		return NULL;
+
+	info->data = (unsigned char*)malloc(info->size);
+	memset(info->data, 0, info->size);
+	read(info->fp, (unsigned char*)info->data, info->size);
 	return info;
 }
 
@@ -37,6 +41,7 @@ extern long file_size(const char *filename) {
 
 extern void free_struct(struct file_info* info) {
 	free(info->filename);
+	free(info->data);
 	close(info->fp);
 	free(info);
 }
@@ -61,6 +66,8 @@ static int check_file(const char *filename) {
 static char* reel_path(const char* filename) {
 	char *pathfile =  (char*)malloc(sizeof(char) * 255);
 	memset((char*)pathfile, 0, 255);
-	sprintf(pathfile, "%s/%s", FILE_PATH, filename);
+	strncat(pathfile, FILE_PATH, strlen(FILE_PATH));
+	strncat(pathfile, "/", 1);
+	strncat(pathfile, filename, strlen(filename));
 	return pathfile;
 }

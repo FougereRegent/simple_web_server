@@ -10,6 +10,7 @@
 struct file_info {
 	int fp;
 	char *filename;
+	unsigned char* data;
 	long size;
 };
 
