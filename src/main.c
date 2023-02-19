@@ -103,11 +103,8 @@ static int create_http_table();
 static void wich_verb(int, char*, ENUM_VERB);
 static void send_header(int, ENUM_CODE);
 static void get_verb(int, const char*);
-static void put_verb(int, const char*);
-static void delete_verb(int, const char*);
-static void post_verb(int, const char*);
-static void head_verb(int, const char*);
 static void send_file(int sock, const char* filename);
+static void not_implemented(int sock);
 
 struct hashtable *http_table;
 
@@ -299,16 +296,16 @@ static void wich_verb(int sock, char *route,ENUM_VERB verb) {
 			get_verb(sock, route);
 			break;
 		case HEAD:
-			head_verb(sock, route);
+			not_implemented(sock);
 			break;
 		case PUT:
-			put_verb(sock, route);
+			not_implemented(sock);
 			break;
 		case DELETE: 
-			delete_verb(sock, route);
+			not_implemented(sock);
 			break;
 		case POST: 
-			post_verb(sock, route);
+			not_implemented(sock);
 			break;
 	}
 }
@@ -362,17 +359,9 @@ static void get_verb(int sock, const char* route) {
 	}
 }
 
-static void put_verb(int sock, const char* route) {
-
-}
-static void delete_verb(int sock, const char* route) {
-
-}
-static void post_verb(int sock, const char* route) {
-
-}
-static void head_verb(int sock, const char* route) {
-
+static void not_implemented(int sock) {
+	send_header(sock, NOT_IMPLEMENTED);
+	send_message(sock, (unsigned char*)"<p>This verb is not implemented</p>");
 }
 
 static void send_file(int sock, const char* filename) {
@@ -390,4 +379,5 @@ static void send_file(int sock, const char* filename) {
 		}
 		total_sent += sent;
 	}
+	free_struct(info);
 }
