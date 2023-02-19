@@ -313,7 +313,7 @@ static void wich_verb(int sock, char *route,ENUM_VERB verb) {
 static void send_header(int sock, ENUM_CODE error_code)  {
 	struct element *item;
 	char res[HEADER_SIZE];
-	const char *header = "Server: tiny-server\r\n"
+	const char *header = "Server: Simple Web Server\r\n"
 						 "Author: Venant-Valery Damien\r\n\r\n";
 
 	memset((char *)res, 0, HEADER_SIZE);
